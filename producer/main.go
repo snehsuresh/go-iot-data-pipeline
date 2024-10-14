@@ -1,3 +1,6 @@
+//go:build producer
+// +build producer
+
 package main
 
 import (
@@ -23,24 +26,27 @@ var (
 )
 
 func init() {
-    // Register the temperature gauge
+    // registering the temperature gauge
     prometheus.MustRegister(temperatureGauge)
 }
 
 func generateTemperature(deviceID string, producer *kafka.Producer) {
-    for {
-        // Generate random temperature
+    //infinte loop
+    for { 
+        // generating random temperature
         temperature := rand.Float64()*100
         log.Printf("Device %s: Temperature: %.2f°C\n", deviceID, temperature)
 
-        // Produce to Kafka
+        // producing to Kafka
         value := fmt.Sprintf(`{"device": "%s", "temperature": %.2f}`, deviceID, temperature)
+        iotTopic := "iot_topic"
+        var iotPtr *string = &iotTopic
         producer.Produce(&kafka.Message{
-            TopicPartition: kafka.TopicPartition{Topic: &"iot_topic", Partition: kafka.PartitionAny},
+            TopicPartition: kafka.TopicPartition{Topic: iotPtr, Partition: kafka.PartitionAny},
             Value:          []byte(value),
         }, nil)
 
-        // Update Prometheus gauge
+        // updating prometheus gauge
         temperatureGauge.WithLabelValues(deviceID).Set(temperature)
 
         time.Sleep(2 * time.Second) // Simulate data generation every 2 seconds
@@ -48,23 +54,23 @@ func generateTemperature(deviceID string, producer *kafka.Producer) {
 }
 
 func main() {
-    // Create Kafka producer
+    // create Kafka producer
     producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "localhost:9092"})
     if err != nil {
         log.Fatalf("Failed to create producer: %s", err)
     }
     defer producer.Close()
 
-    // Start HTTP server for Prometheus metrics
+    // HTTP server for Prometheus metrics
     http.Handle("/metrics", promhttp.Handler())
     go http.ListenAndServe(":8080", nil)
 
-    // Simulate multiple IoT devices
+    // simulating multiple IoT devices
     for i := 1; i <= 5; i++ {
         deviceID := fmt.Sprintf("device_%d", i)
         go generateTemperature(deviceID, producer)
     }
 
-    // Block forever
+    // block forever
     select {}
 }
