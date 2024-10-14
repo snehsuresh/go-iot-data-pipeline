@@ -1,10 +1,10 @@
 # Real-time Data Processing Pipeline
 
 ## Project Overview
-This project implements a real-time data processing pipeline using Go (Golang) for simulating IoT devices, Kafka for message brokering, and Prometheus for monitoring metrics 
-The producer generates random temperature data for multiple simulated devices and sends it to a Kafka topic 
-The consumer listens to that topic and processes the incoming messages, logging the received data 
-Additionally, Prometheus collects and exposes the temperature metrics via an HTTP endpoint for monitoring
+This project implements a real-time data processing pipeline using Go (Golang) for simulating IoT devices, Kafka for message brokering, and Prometheus for monitoring metrics. 
+The producer generates random temperature data for multiple simulated devices and sends it to a Kafka topic.
+The consumer listens to that topic and processes the incoming messages, logging the received data.
+Additionally, Prometheus collects and exposes the temperature metrics via an HTTP endpoint for monitoring.
 
 ## Technologies Used
 - **Programming Language**: Go (Golang)
